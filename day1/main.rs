@@ -2,13 +2,15 @@ use std::fs::File;
 use regex::Regex;
 use std::io::{self, BufRead};
 
-fn match_digit(pattern: Regex, in_line: String) -> String {
+fn match_digit(pattern: &Regex, in_line: &String) -> Vec<String> {
     let mut matched_integers = Vec::new();
-    for int in pattern.cap(&in_line) {
-        println!("Found integer: {}", int.as_str());
-        return int.as_str().to_string();
+
+    for int in pattern.find_iter(&in_line) {
+        //println!("Found integer: {}", int.as_str());
+        matched_integers.push(int.as_str().to_string());
     }
-    return "none".to_string()
+
+    matched_integers
 }
 
 
@@ -27,8 +29,12 @@ fn main() -> io::Result<()> {
         match line {
             Ok(line_content) => {
                 count += 1;
-                let out = match_digit(pattern, line_content);
-                println!("{}: {}", count, out);
+
+                let out = match_digit(&pattern, &line_content);
+                let first = out.first().cloned().unwrap_or_default();
+                let last = out.last().cloned().unwrap_or_default();
+
+                println!("{}) [{}] >> {}{}", count, out.join(""), first, last);
             }
             Err(err) => {
                 eprintln!("Error reading line: {}", err);
