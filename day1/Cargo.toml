@@ -1,10 +1,11 @@
 [package]
-name = "your_project_name"
+name = "day1"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 regex = "1.5"
+lazy_static = "1.4.0"
 
 [[bin]]
 name = "day1"
