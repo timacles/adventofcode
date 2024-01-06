@@ -31,20 +31,59 @@ struct Item {
 
 impl Item {
     fn new(token: Token, pos: Position) -> Self {
-        Item { token, pos, boundary: Vec::new() }
-    }
-
-    fn calculate_boundary(self) {
-        match self.token {
-            Token::Symbol(_) => {
-
-
-            },
-            Token::Int(i) => {
-            },
+        let boundary: Vec<Position>;
+        match token {
+            Token::Symbol(_) => boundary = calc_symbol_boundary(&pos),
+            Token::Int(val) => boundary = calc_int_boundary(val.to_string(), &pos),
         }
+
+        Item { token, pos, boundary }
     }
 }
+
+fn calc_symbol_boundary(pos: &Position) -> Vec<Position> {
+    let mut result: Vec<Position> = Vec::new();
+
+    let start_row = pos.row - 1; 
+    let start_col = pos.col - 2;
+
+    for i in 0..3 {
+        let cur_row = start_row + i;
+
+        for j in 0..3 {
+            let cur_col = start_col + j; 
+
+            let npos = Position{
+                row: cur_row,
+                col: cur_col,
+            };
+
+            result.push(npos);
+        }
+    }
+
+    result
+}
+
+fn calc_int_boundary(val: String, pos: &Position) -> Vec<Position> {
+    let mut result: Vec<Position> = Vec::new();
+    let len = val.len();
+    
+    let start_col = pos.col - len;
+    for i in 0..len {
+        let cur_col = start_col + i; 
+
+        let npos = Position{
+            row: pos.row,
+            col: cur_col,
+        };
+
+        result.push(npos);
+    }
+    
+    result
+}
+
 
 #[derive(Debug)]
 struct Parser {
@@ -62,7 +101,7 @@ impl Parser {
 
     fn parse(&mut self, line: String) {
         self.pos.row += 1;
-        self.pos.col = 0;
+        self.pos.col = 1;
 
         let mut item = String::new();
 
@@ -106,6 +145,17 @@ impl Parser {
         );  
         self.items.push(number_item);
     }
+
+    fn filter_symbols(&self) -> Vec<&Item> {
+        let mut symbols: Vec<&Item> = Vec::new();
+        for item in self.items.iter() {
+            match item.token {
+                Token::Symbol(_) => symbols.push(item),
+                _ => {},
+            }
+        }
+        symbols
+    }
 }
 
 
@@ -129,8 +179,13 @@ fn example1() -> usize {
         parser.parse(line.to_string());
     }
 
-    for item in parser.items {
-        println!("  - {:#?}", item);
+    for item in &parser.items {
+        println!("  - {:?} {:?}", item.token, item.boundary);
+    }
+
+    let symbols = parser.filter_symbols();
+    for symbol in symbols {
+        println!("  - {:?} {:?}", symbol.token, symbol.boundary);
     }
 
     1
