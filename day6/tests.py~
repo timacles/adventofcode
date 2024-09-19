@@ -1,0 +1,8 @@
+import unittest
+from solve_problem import *
+class DAY6(unittest.TestCase):
+    
+    def Sample(self):
+
+if __name__ == '__main__':
+    unittest.main()
