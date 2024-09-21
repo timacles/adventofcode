@@ -15,19 +15,14 @@ def main():
     print("******")
     print("product:",product)
 
-def process(time, dist): 
+def process(time, dist):
     results = [] 
-    # loop over each element
-    for i in range(1, len(time)):
+    for i in range(len(time)):
         t = time[i]
         d = dist[i]
-        if t == "": continue
-
-        print("  time:", time[i], "dist:", dist[i])
-
-        count = calc(t, d)
-        results.append(count)
-    print("Results:", results)
+        result = calc(t, d)
+        results.append(result)
+    #print("Results:", results)
     return results
     
 def calc(time, dist):
@@ -37,17 +32,34 @@ def calc(time, dist):
     for i in range(1, time):
        remaining = time - i
        x = remaining * i
-
        if x > dist:
            count += 1
-           #print("  i:", i, "calc:", x)
     return count
-    
-def parse_raw(data):
-    return list(map(lambda text: re_split(RE_PTRN1, text), data))
 
-def parse_partial(time, dist):
-    return time, dist
+def sanitize(elems):
+    clean = []
+    for e in elems:
+        if is_bad(e):
+            continue
+        clean.append(e)
+    return clean 
+
+def join_elements(elements):
+    out = ""
+    for x in elements:
+        out += x
+    return [out]
+
+def is_bad(elem):
+    if elem == "":
+        return True
+    elif elem in ["Time", "Distance"]:
+        return True
+    return False 
+
+def parse_raw(data):
+    time, dist = list(map(lambda text: re_split(RE_PTRN1, text), data))
+    return sanitize(time), sanitize(dist)
 
 def load_file(f):
     with open(f) as f:
