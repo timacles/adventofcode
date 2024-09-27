@@ -5,10 +5,9 @@ use std::io::{self, BufReader, BufRead};
 
 fn main() {
     //example1();
-    let _ = example1();
-    //let _ = part1();
-    
+    println!(" part 2 result: {}", part2());
 }
+
 
 #[derive(Debug)]
 enum Token {
@@ -16,7 +15,7 @@ enum Token {
     Int(usize),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 struct Position {
     row: usize,
     col: usize,
@@ -39,13 +38,39 @@ impl Item {
 
         Item { token, pos, boundary }
     }
+
+    ///fn is_colliding(&self, in_boundary: Vec<&Position>) -> bool {
+    fn is_colliding(&self, in_item: &Item) -> bool {
+        for pos in &self.boundary {
+            for pos2 in &in_item.boundary {
+                if pos == pos2 {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    fn to_int(&self) -> usize {
+        match self.token {
+            Token::Int(i) => return i,
+            Token::Symbol(_) => panic!("cant call this on a symbol"),
+        }
+    }
+
+    fn get_symbol(&self) -> char {
+        match self.token {
+            Token::Symbol(s) => return s,
+            Token::Int(_) => panic!("shouldnt be calling this here"),
+        }
+    }
 }
 
 fn calc_symbol_boundary(pos: &Position) -> Vec<Position> {
     let mut result: Vec<Position> = Vec::new();
 
     let start_row = pos.row - 1; 
-    let start_col = pos.col - 2;
+    let start_col = pos.col - 2;   // had to make this `-2` for some reason, otherwise off by one
 
     for i in 0..3 {
         let cur_row = start_row + i;
@@ -87,16 +112,18 @@ fn calc_int_boundary(val: String, pos: &Position) -> Vec<Position> {
 
 #[derive(Debug)]
 struct Parser {
+    symbols: Vec<Item>,
     items: Vec<Item>,
     pos: Position,
 }
 
 impl Parser {
     fn new() -> Self {
+        let mut symbols = Vec::new();
         let mut items = Vec::new();
         let mut pos = Position{ row: 0, col: 0 };
 
-        Parser { items, pos }
+        Parser { items, symbols, pos }
     }
 
     fn parse(&mut self, line: String) {
@@ -128,6 +155,11 @@ impl Parser {
                 panic!("unknown character: {}", c);
             }
         }
+
+        if !item.is_empty() {
+            //panic!("r {} i {}", self.pos.row, item);
+            self.handle_number(item.clone());
+        }
     }
 
     fn handle_symbol(&mut self, c: char) {
@@ -135,7 +167,7 @@ impl Parser {
             Token::Symbol(c), 
             Position { row: self.pos.row, col: self.pos.col }
         );
-        self.items.push(symbol_item);
+        self.symbols.push(symbol_item);
     }
 
     fn handle_number(&mut self, item: String) {
@@ -146,22 +178,55 @@ impl Parser {
         self.items.push(number_item);
     }
 
-    fn filter_symbols(&self) -> Vec<&Item> {
-        let mut symbols: Vec<&Item> = Vec::new();
-        for item in self.items.iter() {
-            match item.token {
-                Token::Symbol(_) => symbols.push(item),
-                _ => {},
-            }
+
+    fn sum_valid_items(&self) -> usize {
+        let mut valid_vals: Vec<usize> = Vec::new();
+
+        for s in &self.symbols {
+            for i in &self.items {
+                if s.is_colliding(i) {
+                    println!(" pos: {:?} match: {:?} ", i.pos, i.token);
+                    valid_vals.push(i.to_int());
+                    }
+            } 
+            //println!("  - {:?} {:?}", s.token, s.boundary);
         }
-        symbols
+
+        valid_vals.iter().sum()
+    }
+
+    fn calculate_star_matches(&self) -> usize {
+        let mut valid_vals: Vec<usize> = Vec::new();
+
+        for s in &self.symbols {
+
+            if !(s.get_symbol() == '*') {
+                continue;
+            }
+
+            let mut star_colliders: Vec<usize> = Vec::new();
+
+            for i in &self.items {
+                if s.is_colliding(i) {
+                    star_colliders.push(i.to_int());
+                    //println!(" ps: {:?} match: {:?} ", i.pos, i.token);
+
+                    if star_colliders.len() == 2 {
+                        valid_vals.push(star_colliders[0] * star_colliders[1]);
+                        break;
+                    }
+                    }
+            } 
+            //println!("  - {:?} {:?}", s.token, s.boundary);
+        }
+
+        valid_vals.iter().sum()
     }
 }
 
 
-fn example1() -> usize {
-
-    let example = r#"467..114..
+fn example() -> &'static str {
+    r#"467..114..
 ...*......
 ..35..633.
 ......#...
@@ -170,7 +235,12 @@ fn example1() -> usize {
 ..592.....
 ......755.
 ...$.*....
-.664.598.."#;
+.664.598.."#
+}
+
+fn example2() -> usize {
+
+    let example = example();
 
     let mut parser = Parser::new();
 
@@ -179,46 +249,96 @@ fn example1() -> usize {
         parser.parse(line.to_string());
     }
 
-    for item in &parser.items {
-        println!("  - {:?} {:?}", item.token, item.boundary);
-    }
-
-    let symbols = parser.filter_symbols();
-    for symbol in symbols {
-        println!("  - {:?} {:?}", symbol.token, symbol.boundary);
-    }
-
-    1
+    parser.calculate_star_matches()
 }
 
-fn part1() -> io::Result<()> {
-    let reader = open_file("input.txt")?;
-    let mut unique = HashSet::new();
+fn example1() -> usize {
+
+    let example = example();
+
+    let mut parser = Parser::new();
+
+    for line in example.lines() {
+        println!("{}", line);
+        parser.parse(line.to_string());
+    }
+
+    parser.sum_valid_items()
+}
+
+
+fn part1() -> usize {
+    let reader = open_file("input.txt").expect("couldnt open file");
+    //let mut unique = HashSet::new();
+
+    let mut parser = Parser::new();
 
     for line in reader.lines() {
         if let Ok(line) = line {
-            // Iterate over characters in the line and add them to the HashSet
-            for c in line.chars() {
-                unique.insert(c);
-            }
+            parser.parse(line.to_string());
         }
     }
 
-    println!("unique chars: {:?}", unique);
+    parser.sum_valid_items()
+}
 
-    Ok(())
+fn part2() -> usize {
+    let reader = open_file("input.txt").expect("couldnt open file");
+    //let mut unique = HashSet::new();
+
+    let mut parser = Parser::new();
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            parser.parse(line.to_string());
+        }
+    }
+
+    parser.calculate_star_matches()
 }
 
 fn is_symbol(c: char) -> bool {
     match c {
-        '=' | '*' | '%' | '&' | '/' | '#' | '@' | '+' | '$' => true,
+        '=' | '*' | '%' | '&' | '/' | '#' | '@' | '+' | '$' | '-' => true,
         _ => false,
     }
 }
 
 
-
 fn open_file(file_path: &str) -> io::Result<BufReader<File>> {
     let file = File::open(file_path).expect("failed to open file");
     Ok(BufReader::new(file))
+}
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_example1() {
+        let result = example1();
+        assert_eq!(result, 4361);
+    }
+
+    #[test]
+    fn test_example2() {
+        let result = example2();
+        assert_eq!(result, 467835);
+    }
+
+    #[test]
+    fn test_part1() {
+        let result = part1();
+        assert_eq!(result, 537832);
+    }
+
+    #[test]
+    fn test_part2() {
+        let result = part2();
+        assert_eq!(result, 81939900);
+    }
+
 }

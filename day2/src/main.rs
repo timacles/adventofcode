@@ -358,8 +358,6 @@ fn read_file(path: &str) -> Result<i32, io::Error> {
 }
 
 
-
-
 fn is_delim(in_char: &str) -> bool {
     match in_char {
         ";" | "," | ":" => true,
