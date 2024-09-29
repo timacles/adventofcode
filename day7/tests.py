@@ -10,7 +10,7 @@ class Units(unittest.TestCase):
         assert card_rank("2") == 2
         assert card_rank("3") == 3
 
-    def test_hand_type(self):
+    def test_evaluate_type(self):
         hands = {
             "22222": FIVEKND,
             "AAJJJ": FULLHSE,
@@ -24,6 +24,28 @@ class Units(unittest.TestCase):
         for hand, correct_type in hands.items():
             entry = Entry(hand)
             assert entry.type == correct_type
+
+    def test_evaluate_type2(self):
+        hands = {
+            "22222": FIVEKND,
+            "AAJJJ": FIVEKND,
+            "23333": FOURKND,
+            "233JJ": FOURKND,
+            "223JJ": FOURKND,
+            "2233J": FULLHSE,
+            "AAJ33": FULLHSE,
+            "A2JJJ": FOURKND,
+            "A255J": THREEKND,
+            "A452J": ONEPAIR,
+            "JJ73K": THREEKND,   # bugs
+        }
+        for hand, correct_type in hands.items():
+            entry = Entry(hand)
+            t = evaluate2(entry.hand)
+            if t != correct_type:
+                print(entry)
+                print("  > Correct:", correct_type, ", Ret:", t)
+                raise AssertionError
 
     def test_hand_rank(self):
         hands = {
@@ -55,7 +77,7 @@ class Units(unittest.TestCase):
                 print(a,b)
                 raise AssertionError
 
-class Sample(unittest.TestCase):
+class Sample1(unittest.TestCase):
     def test_sample(self):
         raw = load_file(SAMPLE)
         data = parse(raw)
@@ -71,6 +93,30 @@ class Part1(unittest.TestCase):
         types = classify(data)
         ordered = order(types)
         result = rank_and_solve(ordered)
+        print(result)
+
+class Sample2(unittest.TestCase):
+    def test_part1(self):
+        raw = load_file(SAMPLE)
+        data = parse(raw)
+        update_to_new_types(data)
+        types = classify(data)
+        demote_jack_value()
+        ordered = order(types)
+        result = rank_and_solve(ordered)
+        assert result == 5905
+        print(result)
+
+class Part2(unittest.TestCase):
+    def test_part1(self):
+        raw = load_file(INPUT)
+        data = parse(raw)
+        update_to_new_types(data)
+        types = classify(data)
+        demote_jack_value()
+        ordered = order(types)
+        result = rank_and_solve(ordered)
+        assert result == 248750248
         print(result)
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from functools import cmp_to_key
+from pprint import pprint
 
 
 SAMPLE = "sample.txt"
@@ -24,6 +25,16 @@ TYPES = [
     FIVEKND,
 ]
 
+def update_to_new_types(entries):
+    for entry in entries:
+        entry.type = evaluate2(entry.hand)
+
+
+def demote_jack_value():
+    pos = CARDS.index("J")
+    CARDS.pop(pos)
+    CARDS.append("J")
+
 def rank_and_solve(data):
     i = 0
     vals = []
@@ -32,7 +43,7 @@ def rank_and_solve(data):
             i += 1
             win = i * entry.bet
             vals.append(win)
-            #print(i, entry, win)
+            print(i, entry, win)
     return sum(vals)
 
 def order(types):
@@ -77,6 +88,40 @@ class Entry:
         return self.hand[idx]
 
             
+def evaluate2(hand):
+    if "J" not in hand:
+        return evaluate(hand)
+    counts = enumerate_cards(hand)
+    j_count = counts["J"]
+    for card, count in counts.items():
+        if card == "J" and count != 5:
+            continue
+        combo = j_count + count
+        #print("  DBG > Card:", card, "count:", count, "combo:", combo)
+
+        if count == 5 or combo == 5:
+            return FIVEKND
+        elif count == 4 or combo == 4:
+            return FOURKND
+        elif (
+            (count == 3 or combo == 3)
+            and 2 in [y for x, y in counts.items()
+                      if x != card and x != "J"]
+        ):
+            return FULLHSE
+        elif count == 3 or combo == 3:
+            return THREEKND
+        elif (
+            (count == 2 or combo == 2)
+            and 2 in [y for x, y in counts.items()
+                  if x != card]
+        ):
+            return TWOPAIR
+        elif count == 2 or combo == 2:
+            return ONEPAIR
+        else:
+            return HIGHCARD
+    raise NotImplementedError(f"Card Type Not Found for Eval: `{hand}`")
     
 def evaluate(hand):
     counts = enumerate_cards(hand)
@@ -107,8 +152,6 @@ def enumerate_cards(cards):
     return {k: v for k, v in sorted(counter.items(), key=lambda item: item[1], reverse=True)}
 
 
-def card_rank(card):
-    return len(CARDS) - CARDS.index(card) 
 
 def parse(raw):
     data = []
@@ -118,8 +161,8 @@ def parse(raw):
         data.append(entry)
     return data
     
-def calc(elem):
-    pass
+def card_rank(card):
+    return len(CARDS) - CARDS.index(card) 
 
 def load_file(f):
     with open(f) as f:
