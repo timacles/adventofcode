@@ -15,7 +15,7 @@ clean:
 test:
 	$(PYTHON) -m unittest -v
 
-units sample1 sample2 part1 part2:
+units sample1 sample2 sample3 part1 part2:
 	$(PYTHON) -m unittest -v -k $(@:units=Units)
 
 ##test:
