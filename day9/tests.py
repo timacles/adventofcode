@@ -8,9 +8,12 @@ class Download(unittest.TestCase):
         download_input_file()
 
 class Utils(unittest.TestCase):
-    def test_env(self):
-        print(SESSION_COOKIE)
-    
+    def test_load_file(self):
+        data = load_input_file()
+
+    def test_parse1(self):
+        data = parse(SAMPLE1)
+        print(data)
         
 if __name__ == '__main__':
     unittest.main()
