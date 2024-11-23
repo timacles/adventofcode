@@ -42,7 +42,7 @@ def load_input_file():
         download_input_file()
 
     with open(input_file_path) as f:
-        data = f.readlines()
+        data = f.read()
     return data
 
 

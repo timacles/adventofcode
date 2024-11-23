@@ -14,6 +14,17 @@ class Utils(unittest.TestCase):
     def test_parse1(self):
         data = parse(SAMPLE1)
         print(data)
+
+class Part1(unittest.TestCase):
+    def test_sample(self):
+        result = solve_part1(SAMPLE1)
+        assert result == 114
         
+    def test_input(self):
+        raw = load_input_file()
+        result = solve_part1(load_input_file())
+        print(f"Part 1 Result: {result}")
+        assert == 1684566095
+
 if __name__ == '__main__':
     unittest.main()
