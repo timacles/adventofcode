@@ -14,9 +14,9 @@ clean:
 	find . -name '__pycache__' -delete
 
 test:
-	$(PYTHON) -m unittest -v
+	$(PYTHON) -m unittest -v -k $@
 
-units sample1 sample2 sample3 part1 part2 utils download:
+part1 part2 utils download:
 	$(PYTHON) -m unittest -v -k $(@:units=Units)
 
 .PHONY: run setup install clean test lint

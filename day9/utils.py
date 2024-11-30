@@ -3,6 +3,7 @@ AOC_URL = "https://adventofcode.com/{year}/day/{day}/input"
 
 from os import getcwd, path, getenv
 import sys
+import logging as log
 
 
 def download_input_file():
@@ -46,4 +47,15 @@ def load_input_file():
     return data
 
 
+# Configure the default logger
+log.basicConfig(
+    level=log.DEBUG,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(levelname)s - %(message)s",  # Log format
+    handlers=[
+        log.StreamHandler()  # Log to the terminal
+    ]
+)
+
+debug = log.debug
+info = log.info
 

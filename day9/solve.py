@@ -5,22 +5,67 @@ SAMPLE1 = """\
 """
 
 from dataclasses import dataclass
-from utils import load_input_file
-import logging as log
+from utils import load_input_file, debug
 
-# Configure the default logger
-log.basicConfig(
-    level=log.DEBUG,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    format="%(levelname)s - %(message)s",  # Log format
-    handlers=[
-        log.StreamHandler()  # Log to the terminal
-    ]
-)
-debug = log.debug
-info = log.info
 
 ###########################==--
-### SOLVING #########==--
+### SOLVING  part 2 #########==--
+## ==---------
+
+def solve_part2(input):
+    print(f"*** Part 2 ***")
+    data = parse(input)
+    results = []
+    
+    #*** *** *** *** ***
+    # main loop 
+    #*** *** *** *** ***
+
+    for entry in data:
+        debug(f"*** Start Value: {entry}")
+
+        # Stages is each "cycle" of values
+        # the first stage is the initial set of values
+        stages = [entry]
+
+        steps = calc_steps(entry) 
+        i = 0 
+        while True:
+            stages.append(steps)
+            i += 1
+            #debug(f"  {i} - {steps}")
+            steps = calc_steps(steps)
+            if all(s==0 for s in steps):
+                break
+
+        # reverse to start from the bottom
+        stages = stages[::-1]
+            
+        for i, steps in enumerate(stages):
+            debug(f"  {i} - {steps}")
+            first_step = steps[0]
+            try:
+                next_first_step = stages[i+1][0] 
+            # stop loop if there are no elements left 
+            except IndexError:
+                break
+
+            ## Append to next stage element
+            ## at beginning of list
+            result = next_first_step - first_step
+            stages[i+1].insert(0, result)
+
+            #debug(f"     - First step: {first_step} ; next first step {next_first_step}")
+
+        # first value of the last "stage" element
+        result = stages[-1][0]
+        debug(f"    Result: {result}")
+        results.append(result)
+    return sum(results)
+
+
+###########################==--
+### SOLVING part 1 #########==--
 ## ==---------
 
 def solve_part1(input):
