@@ -6,6 +6,7 @@ from os import getcwd, path, getenv, listdir, mkdir
 import sys
 import logging as log
 from shutil import copyfile
+import importlib
 
 
 log.basicConfig(
@@ -71,14 +72,14 @@ def initialize_day_module(day):
         return
 
     print(f"  initializing module for day {day}.   {new_day_path}")
-    mkdir(new_day_path)
+    #mkdir(new_day_path)
     for directory, filename in get_list_of_template_files():
         template_file_path = path.join(directory, filename)
         init_file = filename.strip('tmpl.')
         new_init_path = path.join(new_day_path, init_file)
         if path.exists(new_init_path):
             raise Exception(f"{new_init_path} already exists")
-        #ecopyfile(template_file_path, new_init_path)
+        #copyfile(template_file_path, new_init_path)
         print(template_file_path, new_init_path)
 
 
@@ -90,3 +91,13 @@ def get_list_of_template_files():
         if filename.startswith('tmpl.'):
             files.append((template_dir, filename,))
     return files
+
+def import_module(day):
+    module_name = 'day' + day
+    try:
+        module = importlib.import_module(module_name)
+        print(f" Loading Solver For: {module_name}")
+        return module
+    except ModuleNotFoundError as e:
+        print(f"Error: Module '{module_name}' not found.")
+        sys.exit(2)
