@@ -12,14 +12,15 @@ from utils import load_input_file, debug
 ### SOLVING  part 2 #########==--
 ## ==---------
 
+
 def solve_part2(input):
     print(f"*** Part 2 ***")
     data = parse(input)
     results = []
-    
-    #*** *** *** *** ***
-    # main loop 
-    #*** *** *** *** ***
+
+    # *** *** *** *** ***
+    # main loop
+    # *** *** *** *** ***
 
     for entry in data:
         debug(f"*** Start Value: {entry}")
@@ -28,34 +29,34 @@ def solve_part2(input):
         # the first stage is the initial set of values
         stages = [entry]
 
-        steps = calc_steps(entry) 
-        i = 0 
+        steps = calc_steps(entry)
+        i = 0
         while True:
             stages.append(steps)
             i += 1
-            #debug(f"  {i} - {steps}")
+            # debug(f"  {i} - {steps}")
             steps = calc_steps(steps)
-            if all(s==0 for s in steps):
+            if all(s == 0 for s in steps):
                 break
 
         # reverse to start from the bottom
         stages = stages[::-1]
-            
+
         for i, steps in enumerate(stages):
             debug(f"  {i} - {steps}")
             first_step = steps[0]
             try:
-                next_first_step = stages[i+1][0] 
-            # stop loop if there are no elements left 
+                next_first_step = stages[i + 1][0]
+            # stop loop if there are no elements left
             except IndexError:
                 break
 
             ## Append to next stage element
             ## at beginning of list
             result = next_first_step - first_step
-            stages[i+1].insert(0, result)
+            stages[i + 1].insert(0, result)
 
-            #debug(f"     - First step: {first_step} ; next first step {next_first_step}")
+            # debug(f"     - First step: {first_step} ; next first step {next_first_step}")
 
         # first value of the last "stage" element
         result = stages[-1][0]
@@ -67,6 +68,7 @@ def solve_part2(input):
 ###########################==--
 ### SOLVING part 1 #########==--
 ## ==---------
+
 
 def solve_part1(input):
     print(f"*** Part 1")
@@ -81,18 +83,17 @@ def solve_part1(input):
         # First loop determines each lower stage
         # store initial value
         stages = [entry]
-        steps = calc_steps(entry) 
-        i = 0 
+        steps = calc_steps(entry)
+        i = 0
         while True:
             stages.append(steps)
             i += 1
-            #debug(f"  {i} - {steps}")
+            # debug(f"  {i} - {steps}")
             steps = calc_steps(steps)
-            if all(s==0 for s in steps):
+            if all(s == 0 for s in steps):
                 break
-            
 
-        # Second loop iterate backwards over 
+        # Second loop iterate backwards over
         # each stage adding the last value previous stage
         stages = stages[::-1]
         for i, steps in enumerate(stages):
@@ -100,8 +101,8 @@ def solve_part1(input):
             last_val = steps[-1]
             try:
                 # Get last val of the next stage
-                last_val_next =  stages[i+1][-1]
-                stages[i+1].append(last_val + last_val_next)
+                last_val_next = stages[i + 1][-1]
+                stages[i + 1].append(last_val + last_val_next)
             # end of list
             except IndexError:
                 break
@@ -116,26 +117,27 @@ def solve_part1(input):
 ### functions
 ##
 
+
 def calc_steps(entry):
     steps = []
     for i in range(1, len(entry)):
-        step = entry[i] - entry[i-1]
+        step = entry[i] - entry[i - 1]
         steps.append(step)
     return steps
 
+
 def parse(input):
     data = []
-    for line in input.split('\n'):
-        if line == '': continue
-        entry = [int(i) for i in line.split(' ')]
+    for line in input.split("\n"):
+        if line == "":
+            continue
+        entry = [int(i) for i in line.split(" ")]
         data.append(entry)
-        #data.append(Entry(entry))
-    return data 
+        # data.append(Entry(entry))
+    return data
+
 
 @dataclass
 class Entry:
     data: list
     steps: list = None
-
-    
-

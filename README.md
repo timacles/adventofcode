@@ -2,4 +2,4 @@
 
 My attempts at AOC problems.
 
-ZZ
+Each day should be a module called from the main file.

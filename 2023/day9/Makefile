@@ -2,7 +2,7 @@ PYTHON = python
 SCRIPT = solve.py 
 TESTS = tests.py 
 
-include .env
+include ../.env
 
 export
 
