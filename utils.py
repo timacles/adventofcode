@@ -25,14 +25,13 @@ def load_input_file(day_module_path):
     input_file_path = path.join(day_dir, "input")
     # download if file no existy
     if not path.exists(input_file_path):
-        cwd = day_module_path
-        outfile_path = path.join(cwd, "input")
-        aoc_day = path.split(cwd)[-1]
+        outfile_path = path.join(day_dir, "input")
+        aoc_day = path.split(day_dir)[-1]
         daynum = aoc_day.replace("day", "")
         aoc_input_url = AOC_URL.format(year=AOC_YEAR, day=daynum)
-        print(f"  Downloading: {aoc_input_url}")
+        print(f"  === Downloading: {aoc_input_url}")
         download_from_url(aoc_input_url, outfile_path)
-        print(f"  Downloaded input to: {outfile_path}")
+        print(f"  === Downloaded input to: {outfile_path}")
     with open(input_file_path) as f:
         data = f.read()
     return data
@@ -45,15 +44,20 @@ def download_from_url(url, outfile_path):
 
     load_dotenv()
 
-    # cookie loaded via Makefile
     SESSION_COOKIE = getenv("AOC_SESSION_COOKIE")
     headers = {"Cookie": f"session={SESSION_COOKIE}"}
     request = Request(url, headers=headers)
+
     try:
         with urlopen(request) as response, open(outfile_path, "wb") as outfile:
             outfile.write(response.read())
     except Exception as e:
-        raise Exception(f"{e}\n---\nERROR: Could not download INPUT file.")
+        if e.code == 404:
+            fatal(f"File not found: {url}")
+        elif e.code == 400:
+            fatal(f"Bad Request. Session cookie expired probably.")
+        else:
+            raise e
 
 
 def parse_day_module_path(filepath):
@@ -71,16 +75,16 @@ def initialize_day_module(day):
         print(f"  DAY {day} ALREADY EXISTS. exiting ... ")
         return
 
-    print(f"  initializing module for day {day}.   {new_day_path}")
-    #mkdir(new_day_path)
+    print(f"  initializing module for day {day}.\n   {new_day_path}")
+    mkdir(new_day_path)
     for directory, filename in get_list_of_template_files():
         template_file_path = path.join(directory, filename)
         init_file = filename.strip('tmpl.')
         new_init_path = path.join(new_day_path, init_file)
         if path.exists(new_init_path):
             raise Exception(f"{new_init_path} already exists")
-        #copyfile(template_file_path, new_init_path)
-        print(template_file_path, new_init_path)
+        copyfile(template_file_path, new_init_path)
+        print(f"  created: {new_init_path}")
 
 
 def get_list_of_template_files():
@@ -92,6 +96,7 @@ def get_list_of_template_files():
             files.append((template_dir, filename,))
     return files
 
+
 def import_module(day):
     module_name = 'day' + day
     try:
@@ -101,3 +106,9 @@ def import_module(day):
     except ModuleNotFoundError as e:
         print(f"Error: Module '{module_name}' not found.")
         sys.exit(2)
+
+
+def fatal(msg):
+    print(f"\nFATAL: {msg}")
+    sys.exit(2)
+

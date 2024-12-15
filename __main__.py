@@ -3,6 +3,8 @@ import argparse
 
 
 def main():
+    ''' the moduler AOC day solver. '''
+
     args = parse_args()
 
     if args.init:
@@ -17,10 +19,12 @@ def main():
     input = utils.load_input_file(day_module.DAY_PATH)
 
     if args.part == '1':
-        day_module.solve_part_one(input)
-
+        result = day_module.solve_part_one(input)
     elif args.part == '2':
-        day_module.solve_part_two(input)
+        result = day_module.solve_part_two(input)
+
+    print(f"  Day {args.day}, Part {args.part}")
+    print(f"    === {result} ===")
 
 
 def parse_args():

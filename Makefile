@@ -1,13 +1,9 @@
 PYTHON = python  
-SCRIPT = solve.py 
+SCRIPT = __main__.py 
 TESTS = tests.py 
 
-include ../.env
-
-export
-
 run:
-	$(PYTHON) $(SCRIPT)
+	$(PYTHON) $(SCRIPT) $(ARGS)
 
 clean:
 	rm '__pycache__'

@@ -15,7 +15,6 @@ from utils import debug, load_input_file
 
 
 def solve_part_two(input):
-    print("\n*** PART -TWO- ***")
     results = []
     col1, col2 = parse(input)
     for i in col1:
@@ -24,13 +23,10 @@ def solve_part_two(input):
             if i == j:
                 count += 1
         results.append(i * count)
-    result = sum(results)
-    print(f"  ==> PART -TWO- RESUlT: [[ {result} ]]")
-    return result
+    return sum(results)
 
 
 def solve_part_one(input):
-    print("\n*** PART -ONE- ***")
     col1, col2 = parse(input)
     col1 = sorted(col1)
     col2 = sorted(col2)
@@ -42,9 +38,8 @@ def solve_part_one(input):
         diff = abs(a - b)
         debug(f"{i}) {a} - {b} :: {diff}")
         diffs.append(diff)
-    result = sum(diffs)
-    print(f"  ==> PART -ONE- RESUlT: [[ {result} ]]")
     return sum(diffs)
+
 
 def parse(input):
     col1 = []
@@ -55,9 +50,3 @@ def parse(input):
         col1.append(int(a))
         col2.append(int(b))
     return col1, col2
-
-def solve():
-    input = load_input_file(DAY_PATH)
-    solve_part_one(input)
-    solve_part_two(input)
-
