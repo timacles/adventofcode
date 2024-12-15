@@ -1,5 +1,6 @@
 import utils
 import argparse
+import unittest
 
 
 def main():
@@ -11,11 +12,12 @@ def main():
         utils.initialize_day_module(args.day)
         return
 
+    day_module = utils.import_module(args.day)
+
     if args.test:
-        print(f"  running tests for day {args.day}")
+        run_tests(args.day)
         return
 
-    day_module = utils.import_module(args.day)
     input = utils.load_input_file(day_module.DAY_PATH)
 
     if args.part == '1':
@@ -54,6 +56,19 @@ def parse_args():
     )
     return parser.parse_args()
     
+
+def run_tests(day):
+    """Discover and run tests."""
+    # Load the tests directly from the `day1` module
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(__import__('day' + day))
+
+    # Run the tests
+    runner = unittest.TextTestRunner()
+    result = runner.run(suite)
+
+    # Exit with the appropriate status code
+    exit(0 if result.wasSuccessful() else 1)
 
 if __name__ == "__main__":
     main()

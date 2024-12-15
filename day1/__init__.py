@@ -12,6 +12,7 @@ DAY_PATH = __file__
 
 
 from utils import debug, load_input_file
+import unittest
 
 
 def solve_part_two(input):
@@ -50,3 +51,17 @@ def parse(input):
         col1.append(int(a))
         col2.append(int(b))
     return col1, col2
+
+
+class TestSamples(unittest.TestCase):
+    def test_sample_one(self):
+        result = solve_part_one(SAMPLE_1)
+        assert result == 11
+
+    def test_sample_two(self):
+        result = solve_part_two(SAMPLE_1)
+        assert result == 31
+
+
+def test():
+    unittest.main()
