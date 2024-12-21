@@ -25,8 +25,9 @@ def main():
     elif args.part == '2':
         result = day_module.solve_part_two(input)
 
-    print(f"  Day {args.day}, Part {args.part}")
-    print(f"    === {result} ===")
+    print(f"  \033[32mDay {args.day}, Part {args.part}: \033[0m")
+    print(f"    \033[32m{result}\033[0m")
+
 
 
 def parse_args():

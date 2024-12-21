@@ -1,29 +1,25 @@
 SAMPLE_1 ="""\
 """
 
-PART_1_SAMPLE_ANSWER = 0
-PART_2_SAMPLE_ANSWER = 0 
+
+PART_1_SAMPLE_ANSWER = None
+PART_2_SAMPLE_ANSWER = None
 
 DAY_PATH = __file__
+
 
 from utils import debug, load_input_file
 import unittest
 
 
 def solve_part_two(input):
-    print("\n*** PART -TWO- ***")
     data = parse(input)
-    result = None
-    print(f"  ==> PART -TWO- RESULT: [[ {result} ]]")
-    return result
+    return None
 
 
 def solve_part_one(input):
-    print("\n*** PART -ONE- ***")
     data = parse(input)
-    result = None
-    print(f"  ==> PART -ONE- RESULT: [[ {result} ]]")
-    return result
+    return None
 
 
 def parse(input):
@@ -37,10 +33,12 @@ def parse(input):
 
 class Sample(unittest.TestCase):
     def test_sample_one(self):
+        ''' Test Sample One '''
         result = solve_part_one(SAMPLE_1)
         assert result == PART_1_SAMPLE_ANSWER
 
     def test_sample_two(self):
+        ''' Test Sample Two '''
         result = solve_part_two(SAMPLE_1)
         assert result == PART_2_SAMPLE_ANSWER
 
