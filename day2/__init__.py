@@ -11,71 +11,94 @@ SAMPLE_1 ="""\
 PART_1_SAMPLE_ANSWER = 2
 PART_2_SAMPLE_ANSWER = 4
 
-
 DAY_PATH = __file__
+DEBUG = True
 
 
-from utils import debug, load_input_file
-import unittest
+from utils import debug as _debug, load_input_file
 from dataclasses import dataclass
+import unittest
 
 
+def eval_all_possibilities(ints):
+
+    # if the first pass is good, then just return
+    legit, offender = evaluate_line(ints)     
+    if legit:
+        return legit
+
+    # Remove each element, test and then reinsert it 
+    offenders = []
+    for i, element in enumerate(ints):
+        ints.pop(i)
+        debug(f"  popped: {element}, {ints}")
+        legit, offender = evaluate_line(ints)
+        # we only need to find one instance popped 
+        # scenario that is legit, so exit if found
+        if legit: 
+            debug(f"  this legit")
+            return legit
+        ints.insert(i, element)
 
 
+def solve_part_two(input):
+    set_debug(True)
+    data = parse(input)
+    counter = 0
+    for i, line in enumerate(data):
+        legit = True
+        ints = [int(x) for x in line.split()]
+        debug(f"[{i}]  ENTRY: {ints} <==---------------------")
+        legit = eval_all_possibilities(ints)
+        if legit:
+            counter += 1
+    print("COUNTER:", counter)
+    return counter
 
-def evaluate_line(ints):
+
+def evaluate_line(ints) -> (bool, tuple):
+    ''' returns legit, & idx, val of the offending element ''' 
     legit = True
+    offender = None
+    prev_trend = determine_trend(ints)
     for i, current in enumerate(ints):
+
         try:
             next = ints[i+1]
         except IndexError:
             break
 
-        diff = abs(x - next)
-        debug(f"  {i}) current: {current}, next: {next}, diff: {diff}")
+        trend = determine_trend([current, next])
+        diff = abs(current - next)
+        #debug(f"    {i}) current: {current}, next: {next}, diff: {diff}")
 
-        # conditions to invalidate on
-        if diff > 3 or diff < 1: 
-            debug("diff violation")
-            legit = False
-        if current > next and trend != DOWN: 
-            debug("trend mismatch down")
-            legit = False
-        if x < next and trend != UP: 
-            debug("trend mismatch up")
-            legit = False 
-    return legit
-
-
-
-def solve_part_two(input):
-    data = parse(input)
-    counter = 0
-    # main 'per line' loop
-    for line in data:
-        legit = True
-        prev = None
-
-        ints = [int(x) for x in line.split()]
-        debug(f"Line: {line}, trend: {trend}")
-
-        
-        if not legit: break
-        legit = True 
-            
-        if legit: 
-            debug('this legit')
-            counter += 1
-            
-    print("COUNTER:", counter)
-    return counter
+        violations = [
+            (diff > 3 or diff < 1, "diff violation"),
+            (current > next and trend != prev_trend, "trend change down"),
+            (current < next and trend != prev_trend, "trend change up"),
+        ]
+        for condition, message in violations:
+            if condition:
+                legit = False
+                offender = (i, current)
+                debug(f"   ==> {message}, offender: {offender}")
+        if not legit:
+            break 
+        # if there are no violations, the loop proceeds
+        prev_trend = trend
+    return legit, offender
 
 
-###
-###===-===-===-===-
-###
+
+
+
+
+### ---  ---  ---  ---  ---  ---  ---  ---
+### ===--===--===--===--===--===--===--===
+### ---  ---  ---  ---  ---  ---  ---  ---
 
 def solve_part_one(input):
+    set_debug(False)
     data = parse(input)
     counter = 0
     # main 'per line' loop
@@ -153,5 +176,49 @@ class CheckExample(unittest.TestCase):
         result = solve_part_two(SAMPLE_1)
         assert result == PART_2_SAMPLE_ANSWER
 
+    def test_edge_case_1(self):
+        ''' Edge case 1 '''
+        ints = [71, 69, 70, 71, 72, 75]
+        debug(ints) 
+        legit = eval_all_possibilities(ints)
+        assert legit == True
+
 
 test = unittest.main
+
+
+def set_debug(setting):
+    global DEBUG
+    if setting:
+        DEBUG = True
+    else:
+        DEBUG = False
+
+
+def debug(msg):
+    if DEBUG:
+        _debug(msg)
+
+
+
+def _old_solve_part_two(input):
+    set_debug(True)
+    data = parse(input)
+    counter = 0
+    for i, line in enumerate(data):
+        legit = True
+        ints = [int(x) for x in line.split()]
+        debug(f"[{i}]  ENTRY: {ints} <==---------------------")
+        legit, offender = evaluate_line(ints)     
+        if legit: 
+            debug('     === this legit ===')
+            counter += 1
+        else:
+            ints.pop(offender[0])
+            debug(f"=== 2nd Eval: {ints}")
+            legit, offender = evaluate_line(ints)
+            if legit: 
+                debug('=== 2nd eval, this legit ===')
+                counter += 1
+    print("COUNTER:", counter)
+    return counter
