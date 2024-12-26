@@ -1,6 +1,7 @@
 import utils
 import argparse
 import unittest
+from shutil import get_terminal_size
 
 
 def main():
@@ -25,9 +26,14 @@ def main():
     elif args.part == '2':
         result = day_module.solve_part_two(input)
 
-    print(f"  \033[32mDay {args.day}, Part {args.part}: \033[0m")
-    print(f"    \033[32m{result}\033[0m")
+    print(f"\n {YELLOW}", "-" * (get_terminal_size().columns - 3))
+    print(f"  {GREEN}Day {args.day}, Part {args.part}, RESULT => {RED}{result}{RESET}\n")
 
+
+GREEN='\033[32m'
+RED='\033[31m'
+YELLOW='\033[33m'
+RESET='\033[0m'
 
 
 def parse_args():
@@ -65,7 +71,7 @@ def run_tests(day):
     suite = loader.loadTestsFromModule(__import__('day' + day))
 
     # Run the tests
-    runner = unittest.TextTestRunner()
+    runner = unittest.TextTestRunner(verbosity=2, failfast=True)
     result = runner.run(suite)
 
     # Exit with the appropriate status code

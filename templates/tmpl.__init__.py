@@ -12,14 +12,14 @@ from utils import debug, set_debug, load_input_file
 import unittest
 
 
-def solve_part_two(input):
-    set_debug(True)
+def solve_part_two(input, _debug=True):
+    set_debug(_debug)
     data = parse(input)
     return None
 
 
-def solve_part_one(input):
-    set_debug(True)
+def solve_part_one(input, _debug=True):
+    set_debug(_debug)
     data = parse(input)
     return None
 

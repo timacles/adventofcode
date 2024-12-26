@@ -7,6 +7,7 @@ import sys
 import logging as log
 from shutil import copyfile
 import importlib
+from pprint import pformat
 
 
 log.basicConfig(
@@ -30,7 +31,7 @@ def set_debug(setting):
 
 def debug(msg):
     if DEBUG:
-        log.debug(msg)
+        log.debug(pformat(msg))
 
 
 def load_input_file(day_module_path):
