@@ -8,16 +8,18 @@ PART_2_SAMPLE_ANSWER = None
 DAY_PATH = __file__
 
 
-from utils import debug, load_input_file
+from utils import debug, set_debug, load_input_file
 import unittest
 
 
 def solve_part_two(input):
+    set_debug(True)
     data = parse(input)
     return None
 
 
 def solve_part_one(input):
+    set_debug(True)
     data = parse(input)
     return None
 

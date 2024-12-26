@@ -187,17 +187,6 @@ class CheckExample(unittest.TestCase):
 test = unittest.main
 
 
-def set_debug(setting):
-    global DEBUG
-    if setting:
-        DEBUG = True
-    else:
-        DEBUG = False
-
-
-def debug(msg):
-    if DEBUG:
-        _debug(msg)
 
 
 

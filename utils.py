@@ -19,6 +19,20 @@ debug = log.debug
 info = log.info
 
 
+DEBUG = False
+
+def set_debug(setting):
+    global DEBUG
+    if setting:
+        DEBUG = True
+    else:
+        DEBUG = False
+
+def debug(msg):
+    if DEBUG:
+        log.debug(msg)
+
+
 def load_input_file(day_module_path):
     """load the input, download if it doesnt exist"""
     day_id, day_dir = parse_day_module_path(day_module_path)
