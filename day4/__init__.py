@@ -97,7 +97,6 @@ class Grid:
             "LEFT": self.left,
         }
 
-
     def diag_1(self, i, j):
         top_right = self.grid(i-1, j+1)
         bottom_left = self.grid(i+1, j-1)
